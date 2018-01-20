@@ -11,13 +11,7 @@ output:
 ---
 
 ## Build your data from scratch?
-Inspired by this [talk of __Albert-László Barabási__](https://youtu.be/7YFNf1ix_yY?t=17m54s) at Google while introducing his book, "[Bursts: The Hidden Patterns Behind Everything We Do](https://books.google.it/books/about/Bursts.html?id=VFcwcgAACAAJ&redir_esc=y)" where he discussed how he was wearing a Garmin sports watch to track his movements (photo below);
-
-<br>
-
-<center><img src="images/barabasi_watch.png" width="500px"></center>
-
-<br>
+I have cleaned some parts of the text here!
 
 And based on knowing myself and __how lazy I can be__, _I set out a goal for myself_. I have a positive experience from recording time of my activities when I face a deadline (e.g., deadlines I had for bachelor, master and PhD entrance exams that all were national level competitive exams requiring long term studies). This activity recording increases my efficiency and productivity. 
 
