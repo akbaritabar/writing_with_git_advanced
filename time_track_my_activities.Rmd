@@ -10,33 +10,6 @@ output:
     toc_float: yes
 ---
 
-## Build your data from scratch?
-Inspired by this [talk of __Albert-László Barabási__](https://youtu.be/7YFNf1ix_yY?t=17m54s) at Google while introducing his book, "[Bursts: The Hidden Patterns Behind Everything We Do](https://books.google.it/books/about/Bursts.html?id=VFcwcgAACAAJ&redir_esc=y)" where he discussed how he was wearing a Garmin sports watch to track his movements (photo below);
-
-<br>
-
-<center><img src="images/barabasi_watch.png" width="500px"></center>
-
-<br>
-
-And based on knowing myself and __how lazy I can be__, _I set out a goal for myself_. I have a positive experience from recording time of my activities when I face a deadline (e.g., deadlines I had for bachelor, master and PhD entrance exams that all were national level competitive exams requiring long term studies). This activity recording increases my efficiency and productivity. 
-
-<!-- <br> -->
-<!-- __add photo of your time tracking from PhD entrance exam!__ -->
-<!-- <center><img src="images/barabasi_watch.png" width="500px"></center> -->
-
-<!-- <br> -->
-
-Also, I think it gives me a good opportunity to better know myself. This way I get to know where and to what extent I can count on myself to keep my word to get the job done without distraction. 
-
-The most important promises are the ones we make to ourselves. So I decided to have an eye on everything I do for a period of more or less one year to analyze it and find out what are my work and life habits. What kind of trends do I follow? Is there any predictable trends happening like the ones Barabasi describes in his talk and book? This required a huge amount of honesty, because I was exactly recording what I was doing. Believe me, it is not an easy task to record the amount of time you waste.
-
-The time period of activity recordings started from 24^th^ of March 2016, to be exact at 10:30 a.m! I kept recording till 9:24 on June 27^th^ 2017 for a total of __460 days__.
-
-In following lines, I am going to import the tabular data I have recorded and exported from [__Hamster time tracker__](https://projecthamster.wordpress.com/) which is an easy to use application. I have removed some activity descriptions and details that I didn’t want to share publicly, not to violate my privacy. But details of records, like start and end time, name of activity and category names I have added for easier analysis are not modified, you remember that honesty was the primary condition? So here we are.
-
-Besides the time tracking data, the other ambitious goal is to import [my Google searches data](./my_google_searches.html) that I described in [another post](./my_google_searches.html) to be compared and analyzed comparatively to see if I can find meaningful trends.
-
 ## Code to read data and have a look
 Let's read in the data (both 460 days time track data and my Google searches data) and have a look at the time track data (we previously had a descriptive analysis of Google searches [here](./my_google_searches.html)). Also we are going to do some manipulations in the activities data to be prepared for further analysis (described all in the comments in the code).
 
@@ -143,11 +116,6 @@ DT::datatable(arrange(.data = highes_and_lowest_frequent_activities, desc(freque
 
 ```
 
-After sorting above table based on '__frequency__' or '__time_spent__' columns (by clicking on the column names), one interesting fact gets revealed. I call it _memory's misleading recalls_! I don't know if it is a thing in Psychology and similar sciences or not, but with experience I have found out that my memory reminds (or emphasizes) some activities more than others, and when I think about those activities, _I realize my memory tends to pick them based on the frequency of the times I have been doing them, not based on the time spent on them_. 
-
-Let me put it in an example, imagine that in a long working day, I have spent two big shares of my time, in an uninterrupted manner, on my research activities, each for 3 hours. But during this day, for five times I had to check a social media page to follow-up news on an ongoing event, each time for 5-10 minutes. 
-
-At the end of the day, my perfectionist mind tricks me into believing that I have been checking that social media page a lot during the day and I haven't worked much, while looking at the time spent on these activities we clearly see that they are not comparable. 
 
 Same happens when you sort the time spent and frequency of activities on the table above, the order of them changes in an interesting way, some activities come up or go down on the list. This is more obvious when you look at the summary table of categories below, when you sort it based on time spent, _Research works_ is the first, when you sort based on the number of frequencies, _Hobbies_ becomes first. So it means I have spent more time on my work activities, but the number of times I have been involved with my hobbies are more (although with shorter aggregate time).
 
