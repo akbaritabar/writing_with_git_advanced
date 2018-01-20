@@ -1,0 +1,146 @@
+---
+title: "Is my mind tricking me to work more?!" 
+subtitle: "A closer look at 365 days of an economic migrant’s life!"
+author: "Ali"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Build your data from scratch?
+- Inspired by this [talk of __Albert-László Barabási__](https://youtu.be/7YFNf1ix_yY?t=17m54s) at Google 
+- While introducing his book, "[Bursts: The Hidden Patterns Behind Everything We Do](https://books.google.it/books/about/Bursts.html?id=VFcwcgAACAAJ&redir_esc=y)"
+
+
+## {.build .smaller}
+![](images/barabasi_watch.png)
+
+## {.build .smaller}
+And based on knowing myself and __how lazy I can be__, _I set out a goal for myself_. I have a positive experience from recording time of my activities when I face a deadline (e.g., deadlines I had for bachelor, master and PhD entrance exams that all were national level competitive exams requiring long term studies). This activity recording increases my efficiency and productivity. 
+
+```{r read json files, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# clean the R workspace
+rm(list = ls())
+# Load libraries
+# if you don't have them installed, write "install.packages("tidyverse")"
+# tidyverse to allow us to manipulate data, clean it, plot it
+require(tidyverse)
+# jsonlite to allow us to work with "json" files which google exports
+require(jsonlite)
+# kniter, because I am going to use "kable" function in printing nicer tables
+require(knitr)
+# We are going to use "datatable" function from DT package to add sortable and interactive tables into the html output of this report
+require(DT)
+# we will need lubridate package to work with time data in more efficient and easier manner
+require(lubridate)
+# we are using scales library to be able to give pretty break points for every hour of 24 hours day on the plot with "scale_x_continuous" or "scale_y_continuous" function
+require(scales)
+# Import my 460 days activities data (time tracking)
+activities_460_days <- read_csv("./data/time_track_data/time_track_one_aggregate_file.csv")
+
+# adding a column with time spent on activities in hours to be more understandable (rounding hours not to have digits)
+activities_460_days$duration_hours <- round((activities_460_days$duration_minutes / 60), digits = 0)
+
+# I will filter out all the activities that have lasted less than 5 minutes
+activities_460_days <- activities_460_days %>% 
+  filter(duration_minutes > 4)
+
+# filtering activities to only one full year based on dates I choose here
+start_sample <- activities_460_days$start_time[[56]]
+end_sample <- activities_460_days$start_time[[4079]]
+# one full year activities
+activities_460_days <- activities_460_days %>% 
+  filter(start_time > start_sample & start_time < end_sample)
+
+# I am going to add a new variable to recode category to only three groups to differentiate between work related activities and non work related ones, in a more brief way
+activities_460_days$category_2cat <- NA
+activities_460_days$category_2cat[activities_460_days$category %in% c("pro bono work", "Uni related", "Research works & thesis")] <- "Work" 
+activities_460_days$category_2cat[activities_460_days$category %in% c("Hobbies", "Unsorted")] <- "Hobby & other"
+
+# Now let's have a look at 460 days activities
+glimpse(activities_460_days)
+
+# Import the Google searches data
+# Here there is going to be a for loop to read all the json files you have downloaded from Google takeout
+# Before, we need to build an R list to store the data so:
+# an empty list to store all the time data we take out of each file
+time_data_list <- list()
+# We need to list all the files in the directory which have ".json" extension; to use this script on your own data, you will need to modify the directory url
+json_file_urls <- list.files("./data/google_searches/", pattern = ".\\json", full.names = T)
+# after listing the json files,  we are going to read them one by one and make a data frame of the search time stamps in each of them
+for (j in seq_along(json_file_urls)) {
+  # fromJSON is a function in Jsonlite package to read json files
+  tmp_json_txt <- fromJSON(txt = json_file_urls[j])
+  # call to bind_rows to make a dataframe of all the timestamps and store it as j element of our list
+  time_data_list[[j]] <- bind_rows(tmp_json_txt[["event"]][["query"]][["id"]])
+}
+# call bind_rows once more on all the elements of list we built above, which are the timestamps in each file, to be integrated in one complete dataframe
+time_data <- bind_rows(time_data_list)
+# increasing number of digits R is going to show us not to see time stamps in scientific form
+options(scipen = 25)
+# converting time stamps from character to double to be able to convert them to date later
+time_data$timestamp_usec <- as.double(time_data$timestamp_usec)
+
+# from now I will use "dplyr" data frame format which gives more possibilities to work with dataframe
+time_data <- tbl_df(time_data)
+# adding a column which will include clear (human readable time and date)
+time_data <- time_data %>% 
+  mutate(new_date = as.POSIXct(timestamp_usec/1000000, origin = "1970-01-01", tz = "GMT"))
+# also adding two other columns to separate day from hours to use in visualizations
+time_data <- time_data %>% 
+  separate(col = new_date, into = c("day", "hour"), sep = " ", remove = F)
+
+# convert day to "date" format R will understand
+time_data$day <- as.Date(time_data$day)
+
+# adding a column which assigns months of activity (to use later for monthly reports)
+time_data$month <- floor_date(time_data$day, "month")
+# also let's add month names "as words" to another column, it will come handy
+time_data$month_name <- months(time_data$day)
+# beside that, let's take "years" out as well and save them as another column which will be useful to draw meaningfull plots
+time_data$year <- format.Date(time_data$day, "%Y")
+
+```
+
+
+```{r most and least frequent activity, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# I will group activities based on category and name, and aggregate the frequency and time spent on them
+highes_and_lowest_frequent_activities <- activities_460_days %>% 
+  group_by(category, activity) %>% 
+  summarise(frequency = n(), time_spent_minutes = sum(duration_minutes, na.rm = T), time_spent_hours = round((sum(duration_minutes, na.rm = T) / 60), digits = 0))
+
+# Ten most frequent and time consuming activities 
+# DT::datatable(arrange(.data = highes_and_lowest_frequent_activities, desc(frequency))[1:10, ], caption = "10 most frequent and 10 most time consuming activities (Sort based on 'frequency' or 'time_spent' columns by click)")
+
+```
+
+
+## Most & least active month, week, day and hour of day
+Now let's have a look at the time trends of activities. Which month, day, or week have been the most/least active ones? First I am going to add some new columns to activities table, to include day of the month, week number and month name to be used to look more into temporal trends. Then I have answered those questions in the plots bellow.
+
+## {.build .smaller}
+```{r month day and week activities 1, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# adding columns for hours of day, day of week, day of month, number of week in year, month name
+activities_460_days <- activities_460_days %>% 
+  mutate(start_hour = hour(start_time), end_hour = hour(end_time), week_day = wday(start_time, label = T, abbr = F) , month_day = day(start_time), week_number = week(start_time), month_name = month(start_time, label = T, abbr = F))
+
+# plotting most active day of week, day of month, month and week of year
+# Week days
+ggplot(activities_460_days, aes(x = week_day,  group = category)) + 
+    geom_bar(aes(y = ..prop.., fill = factor(..x..)), stat = "count") +
+    # geom_text(aes(label = scales::percent(..prop..),
+    #                y = ..prop.. ), stat = "count", vjust = -.20) +
+    labs(y = "Percent", x = "Week Days", fill = "category", scale_color_manual(labels = as.factor(activities_460_days$category))) +
+    facet_wrap(~category) +
+    scale_y_continuous(labels = percent) +
+      guides(fill = FALSE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+## Closing words
+> - Did you see how easy it is to move from RMD report to Presentation file !
+> - Yay !
