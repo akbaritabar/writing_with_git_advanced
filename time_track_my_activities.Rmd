@@ -129,7 +129,10 @@ DT::datatable(activities_460_days %>%
 ```
 
 ### Most & least active month, week, day and hour of day
-Now let's have a look at the time trends of activities. Which month, day, or week have been the most/least active ones? First I am going to add some new columns to activities table, to include day of the month, week number and month name to be used to look more into temporal trends. Then I have answered those questions in the plots bellow.
+Now let's have a look at the time trends of activities. Which month, day, or week have been the most/least active ones? First I am going to add some new columns to activities table, to include day of the month, week number and month name to be used to look more into temporal trends. 
+
+SOME TEXT THAT I ADDED TO MAKE THE WORKING DIRECTORY MESSY !
+
 
 ```{r month day and week activities 1, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 # adding columns for hours of day, day of week, day of month, number of week in year, month name
